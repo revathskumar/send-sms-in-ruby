@@ -39,6 +39,7 @@ class Way2sms
   end
 
   def send_sms msisdn,message
+    login if @cookie.nil?
     headers = set_header @cookie, @referer
     data = "MobNo=#{msisdn}&textArea=#{message}&HiddenAction=instantsms&login=&pass=&Action=abfghst5654g"
     return @http.post("/quicksms.action?custid=\"+custid+\"&sponserid=\"+sponserid+\"",data,headers.delete_if {|i,j| j.nil? })
@@ -54,10 +55,23 @@ class Way2sms
     end
   end
 
-  def send_to_group msisdns, message
+  def send_to_many msisdns, message
     msisdns = msisdns.split(';')
-    msisdns.each | msisdn | do
-      response = send_sms msisdn,message
+    response = {}
+    msisdns.each do | msisdn |
+      response[msisdn] = send msisdn,message
+    end
+    return response
+  end
+
+  def logout
+    response = @http.get("/jsp/logout.jsp");
+    @cookie = nil
+    case response.code
+      when  /2\d{2}/
+        return {:success => true,:message => "Logout successfully"}
+      else
+        return {:success => false,:message => "Logout failed"}
     end
   end
 end

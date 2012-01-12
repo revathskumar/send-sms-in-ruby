@@ -33,12 +33,12 @@ describe Way2sms, "send SMS via way2sms" do
 
   it "should send SMS to individual" do
     sms.login
-    sms.send_sms('9995436867', 'Testing Ruby!!').should == {:success => true,:message => "Send successfully"}
+    sms.send('9995436867', 'Testing Ruby!!').should == {:success => true,:message => "Send successfully"}
   end
 
   it "should accept send SMS to group" do
     sms.login
-    sms.send_to_group('9995436867;9037864203;9037107542', 'Testing Ruby!!').should == {:success => true,:message => "Send successfully"}
+    sms.send_to_many('9995436867;9037864203;9037107542', 'Testing Ruby!!').should == {:success => true,:message => "Send successfully"}
   end
 
   it "successfully logged out" do 
