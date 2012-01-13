@@ -4,9 +4,7 @@ This is a template repository for Ruby and RSpec along with Autotest and RCov.
 
 ## Bootstrapping
 
-    $ cp -r ruby-tdd-template new-repository
-    $ rm -rf new-repository/.git/                 # Do not remove the .gitignore which has sensible defaults
-    $ cd name-of-your-new-repository && git init
+    $ git init
     $ echo "*~" >> .git/info/exclude              # Ignores temporary editor files from git ~ without polluting .gitignore
 
   Edit README:
