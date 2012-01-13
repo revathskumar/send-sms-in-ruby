@@ -41,7 +41,7 @@ class Way2sms
         end
         return {:success => false,:message => "Login failed"}
       else
-        return "Http Error"
+        return {:success => false,:message => "Http Error"}
     end
   end
 
