@@ -10,6 +10,7 @@ group :development do
   gem "yard"
   gem "ci_reporter"
   gem "simplecov-rcov"
+  gem "hpricot"
 end
 
 group :osx do

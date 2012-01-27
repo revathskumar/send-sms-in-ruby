@@ -1,17 +1,18 @@
 require "net/http"
 require "net/https"
 require "uri"
+require "hpricot"
 
-class Way2sms
+class SendSms
   attr_accessor :username, :password
 
   URL = 'http://site6.way2sms.com'
  
-  def initialize(username = "", password = "")
+  def initialize(username = "", password = "",autologin = true)
     @username = username
     @password = password
     @uri = URI.parse URL
-    @cookie = nil
+    @cookie = @action = nil
     @referer = URL
     @http = Net::HTTP.new(@uri.host,@uri.port)
   end
@@ -37,6 +38,7 @@ class Way2sms
         if response['location'].include?("Main.action")
           @cookie ||= response['set-cookie']
           @referer ||= response['referer']
+          @action = getAction
           return {:success => true,:message => "Login successfully"}
         end
         return {:success => false,:message => "Login failed"}
@@ -45,9 +47,16 @@ class Way2sms
     end
   end
 
+  def getAction
+    headers = set_header @cookie, @referer
+    response = @http.get("/jsp/InstantSMS.jsp",headers.delete_if {|i,j| j.nil? })
+    hdoc = Hpricot(response.body)
+    return (hdoc/"#Action").attr('value')  
+  end
+
   def send_sms msisdn,message
     headers = set_header @cookie, @referer
-    data = "MobNo=#{msisdn}&textArea=#{message}&HiddenAction=instantsms&login=&pass=&Action=abfghst5654g"
+    data = "MobNo=#{msisdn}&textArea=#{message}&HiddenAction=instantsms&login=&pass=&Action=#{@action}"
     return @http.post("/quicksms.action?custid=\"+custid+\"&sponserid=\"+sponserid+\"",data,headers.delete_if {|i,j| j.nil? })
   end
 

@@ -1,8 +1,8 @@
 require_relative 'spec_helper'
-require 'way2sms'
+require 'sendsms'
 
 
-describe Way2sms, "send SMS via way2sms" do
+describe SendSms, "send SMS via way2sms" do
 
   ####################################################################################
   #                         Substitute the VALID CREDENTIALS and                     #
@@ -10,7 +10,7 @@ describe Way2sms, "send SMS via way2sms" do
   #                         the whole tests                                          #
   ####################################################################################
 
-  let(:sms) { Way2sms.new '9995436867','123456'}
+  let(:sms) { SendSms.new '9995436867','123456'}
 
   it "should respond to login, set_header, send_sms" do
     sms.should respond_to :login
