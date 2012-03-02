@@ -55,20 +55,39 @@ describe SendSms, "send SMS via way2sms" do
     sms.logout.should == {:success => true,:message => "Logout successfully"}
   end
 
-  # it "should login successfully" do
-  #   sms.login.should == {:success => true,:message => "Login successfully"}
-  # end
-
-  # it "should send SMS to individual" do
-  #   sms.login
-  #   sms.send('9995436867', 'Testing Ruby!!').should == {:success => true,:message => "Send successfully"}
-  # end
-
-  # it "should send SMS to group" do
-  #   sms.login
-  #   sms.send_to_many('9995436867;9037864203;9037107542', 'Testing Ruby!!').should == {"9995436867" => {:success => true,:message => "Send successfully"},
-  #   "9037864203" => {:success => true,:message => "Send successfully"},
-  #   "9037107542" => {:success => true,:message => "Send successfully"}}
-  # end
+#  it "should login successfully" do
+#    sms.login.should == {:success => true,:message => "Login successfully"}
+#  end
+#
+#  it "should send SMS to individual" do
+#    sms.login
+#    sms.send('9995436867', 'should send SMS to individual').should == {:success => true,:message => "Send successfully"}
+#  end
+#
+#  it "send method should accept an array of msisdn" do
+#    sms.send(["9995436867","9037864203","9037107542"],"Testing Ruby.......array").should == {"9995436867" => {:success => true,:message => "Send successfully"},
+#      "9037864203" => {:success => true,:message => "Send successfully"},
+#      "9037107542" => {:success => true,:message => "Send successfully"}}
+#  end
+#
+#  it "send method should accept semicolon seperated msisdns" do
+#    sms.send("9995436867;9037864203;9037107542","send method should accept semicolon seperated msisdns").should == {"9995436867" => {:success => true,:message => "Send successfully"},
+#      "9037864203" => {:success => true,:message => "Send successfully"},
+#      "9037107542" => {:success => true,:message => "Send successfully"}}
+#  end
+#
+#  it "send method should accept an Hash of msisdn" do
+#    msisdn = { 0 => "9995436867", 1 => "9037864203" , 2 => "9037107542"}
+#    sms.send(msisdn,"send method should accept an Hash of msisdn").should == {"9995436867" => {:success => true,:message => "Send successfully"},
+#      "9037864203" => {:success => true,:message => "Send successfully"},
+#      "9037107542" => {:success => true,:message => "Send successfully"}}
+#  end
+#
+#  it "should send SMS to group" do
+#    sms.login
+#    sms.send_to_many('9995436867;9037864203;9037107542', 'send to many method should accept semicolon seperated msisdns').should == {"9995436867" => {:success => true,:message => "Send successfully"},
+#    "9037864203" => {:success => true,:message => "Send successfully"},
+#    "9037107542" => {:success => true,:message => "Send successfully"}}
+#  end
 
 end
