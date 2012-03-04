@@ -2,7 +2,9 @@ Sendsms Gem [![Build Status](https://secure.travis-ci.org/revathskumar/send-sms-
 ------------------------
 
 
-Sendssms helps you to send SMS via way2sms from ruby.
+Sendsms gem helps you to send SMS via way2sms from ruby.
+
+[yard Documentation](http://rubydoc.info/gems/sendsms/frames)
 
 ## Usage
 
