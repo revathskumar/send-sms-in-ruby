@@ -1,0 +1,8 @@
+version 0.0.5
+-----------------
+* now individual and group sms can be send from send method
+* send method now accepts array, hash, semicolon seperated msisdns and individual msisdn
+* yard documentation
+* default to automatic logout after sending sms
+* separated private and public methods
+* changed test cases for private methods
