@@ -11,6 +11,7 @@ group :development do
   gem "ci_reporter"
   gem "simplecov-rcov"
   gem "hpricot"
+  gem 'webmock'
 end
 
 group :osx do
