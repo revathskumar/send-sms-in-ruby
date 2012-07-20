@@ -1,4 +1,4 @@
-Sendsms Gem [![Build Status](https://secure.travis-ci.org/revathskumar/send-sms-in-ruby.png)](http://travis-ci.org/revathskumar/send-sms-in-ruby)
+Sendsms Gem [![Build Status](https://secure.travis-ci.org/revathskumar/send-sms-in-ruby.png)](http://travis-ci.org/revathskumar/send-sms-in-ruby?branch=master)
 ------------------------
 
 
