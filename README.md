@@ -1,4 +1,4 @@
-Sendsms Gem [![Build Status](https://secure.travis-ci.org/revathskumar/send-sms-in-ruby.png)](http://travis-ci.org/revathskumar/send-sms-in-ruby?branch=master) [![Dependency Status](https://gemnasium.com/revathskumar/send-sms-in-ruby.png)](https://gemnasium.com/revathskumar/send-sms-in-ruby)
+Sendsms Gem [![Build Status](https://secure.travis-ci.org/revathskumar/send-sms-in-ruby.png)](http://travis-ci.org/revathskumar/send-sms-in-ruby?branch=master) [![Dependency Status](https://gemnasium.com/revathskumar/send-sms-in-ruby.png)](https://gemnasium.com/revathskumar/send-sms-in-ruby) [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/revathskumar/send-sms-in-ruby)
 ------------------------
 
 
