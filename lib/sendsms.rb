@@ -32,7 +32,7 @@ class SendSms
 
   # The way2sms root url
   URL = 'http://site6.way2sms.com'
- 
+
   #
   # Initiate Sendsms class with way2sms username and password
   #
@@ -137,7 +137,7 @@ class SendSms
   # To send Group SMS
   #
   # @deprecated Use {#send} instead of this method
-  # 
+  #
   #
   # @param [String] msisdns
   #   A semicolon seperated string of msisdns
@@ -156,6 +156,7 @@ class SendSms
   #
   #
   def send_to_many msisdns, message
+    @auto_logout = false
     if @cookie.nil?
       login_res = login
       return {:success => false,:message => "Login failed"} if !login_res[:success]
@@ -219,7 +220,7 @@ class SendSms
   #
   def set_header(cookie=nil,referer=nil)
     {"Cookie" => cookie , "Referer" => referer ,"Content-Type" => "application/x-www-form-urlencoded",
-      "User-Agent" => "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.1.3) Gecko/20091020 Ubuntu/9.10 (karmic) Firefox/3.5.3 GTB7.0" }
+      "User-Agent" => '"Mozilla/5.0 (Windows NT 6.1; Intel Mac OS X 10.6; rv:7.0.1) Gecko/20100101 Firefox/7.0.1"' }
   end
 
   #
@@ -264,8 +265,8 @@ class SendSms
     headers = set_header @cookie, @referer
     data = "MobNo=#{msisdn}&textArea=#{message}&HiddenAction=instantsms&login=&pass=&Action=abfghst5654g"
     response = @http.post("/quicksms.action?custid=\"+custid+\"&sponserid=\"+sponserid+\"",data,headers.delete_if {|i,j| j.nil? })
-    case response.code
-      when  /2\d{2}/
+    case response["location"]
+      when  /\bsuccessfully\b/
         {:success => true,:message => "Send successfully"}
       else
         {:success => false,:message => "Sending failed"}

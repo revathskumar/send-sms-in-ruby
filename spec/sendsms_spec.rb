@@ -7,11 +7,25 @@ describe SendSms, "send SMS via way2sms" do
 
   subject { SendSms.new "9995012345", '123456' }
 
+  let(:mock_headers) {
+    {'Accept'=>'*/*', 'Content-Type'=>'application/x-www-form-urlencoded', 'Cookie'=>'some cookie', 'Referer'=>'http://site6.way2sms.com', 'User-Agent'=>'"Mozilla/5.0 (Windows NT 6.1; Intel Mac OS X 10.6; rv:7.0.1) Gecko/20100101 Firefox/7.0.1"'}
+  }
+
+  let(:mock_headers_without_cookie) {
+    {'Accept'=>'*/*', 'Content-Type'=>'application/x-www-form-urlencoded', 'Referer'=>'http://site6.way2sms.com', 'User-Agent'=>'"Mozilla/5.0 (Windows NT 6.1; Intel Mac OS X 10.6; rv:7.0.1) Gecko/20100101 Firefox/7.0.1"'}
+  }
+
+  let(:mock_headers_with_encoding) {
+    {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/x-www-form-urlencoded', 'Referer'=>'http://site6.way2sms.com', 'User-Agent'=>'"Mozilla/5.0 (Windows NT 6.1; Intel Mac OS X 10.6; rv:7.0.1) Gecko/20100101 Firefox/7.0.1"'}
+  }
+
+
+
   before(:each) do
     stub_request(:post, "http://site6.way2sms.com/Login1.action")
     .with(
       body: {"password"=>"123456", "username"=>"9995012345"},
-      headers: {'Accept'=>'*/*', 'Content-Type'=>'application/x-www-form-urlencoded', 'Referer'=>'http://site6.way2sms.com', 'User-Agent'=>'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.1.3) Gecko/20091020 Ubuntu/9.10 (karmic) Firefox/3.5.3 GTB7.0'})
+      headers: mock_headers_without_cookie)
     .to_return(
       body: {},
       headers: {location: ""},
@@ -21,7 +35,7 @@ describe SendSms, "send SMS via way2sms" do
     stub_request(:post, "http://site6.way2sms.com/Login1.action")
     .with(
       body: {"password"=>"654321", "username"=>"9995012345"},
-      headers: {'Accept'=>'*/*', 'Content-Type'=>'application/x-www-form-urlencoded', 'Referer'=>'http://site6.way2sms.com', 'User-Agent'=>'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.1.3) Gecko/20091020 Ubuntu/9.10 (karmic) Firefox/3.5.3 GTB7.0'})
+      headers: mock_headers_without_cookie)
     .to_return(
       :status => 302,
       :body => "",
@@ -29,9 +43,23 @@ describe SendSms, "send SMS via way2sms" do
     )
 
     stub_request(:get, "http://site6.way2sms.com/jsp/InstantSMS.jsp")
-    .with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/x-www-form-urlencoded', 'Referer'=>'http://site6.way2sms.com', 'User-Agent'=>'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.1.3) Gecko/20091020 Ubuntu/9.10 (karmic) Firefox/3.5.3 GTB7.0'})
+    .with(:headers => mock_headers_with_encoding)
     .to_return(:status => 200, :body => "<input type='hidden' id='Action' value='asdfgh'/>", :headers => {})
 
+
+    stub_request(:post, "http://site6.way2sms.com/quicksms.action?custid=\"+custid+\"&sponserid=\"+sponserid+\"")
+    .with(
+      body: {"MobNo" => /^[0-9]{10}$/, "textArea"=> "Test Verbiage", "HiddenAction"=>"instantsms", "login"=> "", "pass"=> "", "Action"=>"abfghst5654g"},
+      headers: mock_headers
+    )
+    .to_return(
+      :status => 302,
+      :body => "",
+      :headers => {location: "http://site6.way2sms.com/generalconfirm.action?SentMessage=Message+has+been+submitted+successfully"}
+    )
+
+    stub_request(:get, "http://site6.way2sms.com/jsp/logout.jsp").
+    to_return(:status => 200, :body => "", :headers => {})
   end
 
   describe "#login" do
@@ -55,22 +83,17 @@ describe SendSms, "send SMS via way2sms" do
   describe "#set_header" do
     context "if cookie and referer are not passed" do
       it "should return a headers with cookie and referer as nil" do
-        subject.__send__(:set_header).should == {
-          "Cookie" => nil ,
-          "Referer" => nil ,"Content-Type" => "application/x-www-form-urlencoded",
-          "User-Agent" => "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.1.3) Gecko/20091020 Ubuntu/9.10 (karmic) Firefox/3.5.3 GTB7.0"
-        }
+        header = subject.__send__(:set_header)
+        header["Cookie"].should eq nil
+        header["Referer"].should eq nil
       end
     end
 
     context "if cookie and referer are passed" do
       it "should return a headers with cookie and referer as they passed" do
-        subject.__send__(:set_header,"test_cookie",'test_referer').should == {
-          "Cookie" => 'test_cookie' ,
-          "Referer" => 'test_referer',
-          "Content-Type" => "application/x-www-form-urlencoded",
-          "User-Agent" => "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.1.3) Gecko/20091020 Ubuntu/9.10 (karmic) Firefox/3.5.3 GTB7.0"
-        }
+        header = subject.__send__(:set_header,"test_cookie",'test_referer')
+        header["Cookie"].should eq 'test_cookie'
+        header["Referer"].should eq 'test_referer'
       end
     end
   end
@@ -116,8 +139,6 @@ describe SendSms, "send SMS via way2sms" do
   end
 
   describe "#send" do
-    #
-
     context "when the user is not logged in" do
       it "should try to login and on failer return message 'Login failed'" do
         subject.send("9995012345", 'Test Verbiage').should == {:success => false,:message => "Login failed"}
@@ -125,70 +146,85 @@ describe SendSms, "send SMS via way2sms" do
     end
 
     context "when the user is logged in and a single msisdn is provided" do
-      it "should try to send SMS and return return message 'Send successfully'" do
+      it "should try to send SMS and return message 'Send successfully'" do
+        subject.instance_variable_set(:@cookie, "some cookie")
         subject.send("9995012345", 'Test Verbiage').should == {:success => true,:message => "Send successfully"}
       end
     end
 
+    context "when msisdns given as semicolon seperated" do
+      it "should try to send SMS and return message 'Send successfully'" do
+        subject.instance_variable_set(:@cookie, "some cookie")
+        subject.send("9995012345;9995678901", 'Test Verbiage').should == {
+          "9995012345"=>{:success => true,:message => "Send successfully"},
+          "9995678901"=>{:success => true,:message => "Send successfully"}
+        }
+      end
+    end
+
+    context "when msisdns given as an array" do
+      it "should try to send SMS and return message 'Send successfully'" do
+        subject.instance_variable_set(:@cookie, "some cookie")
+        subject.send(["9995012345","9995678901"], 'Test Verbiage').should == {
+          "9995012345"=>{:success => true,:message => "Send successfully"},
+          "9995678901"=>{:success => true,:message => "Send successfully"}
+        }
+      end
+    end
+
+    context "when @auto_logout" do
+      before :each do
+        subject.instance_variable_set(:@cookie, "some cookie")
+      end
+
+      it "it should call logout method on if @auto_logout is true" do
+        subject.instance_variable_set(:@auto_logout, true)
+        subject.should_receive(:logout)
+        subject.send("9995012345", 'Test Verbiage').should == {:success => true,:message => "Send successfully"}
+      end
+
+      it "should not logout when @auto_logout is false" do
+        subject.instance_variable_set(:@auto_logout, false)
+        subject.should_not_receive(:logout)
+        subject.send("9995012345", 'Test Verbiage').should == {:success => true,:message => "Send successfully"}
+      end
+    end
   end
 
   describe "#send_to_many" do
+    context "when the user is not logged in" do
+      it "should try to login and on failer return message 'Login failed'" do
+        subject.send_to_many("9995012345;9995678901", 'Test Verbiage').should == {:success => false,:message => "Login failed"}
+      end
+    end
 
+    context "when msisdns given as semicolon seperated" do
+      it "should try to send SMS and return message 'Send successfully'" do
+        subject.instance_variable_set(:@cookie, "some cookie")
+        subject.send_to_many("9995012345;9995678901", 'Test Verbiage').should == {
+          "9995012345"=>{:success => true,:message => "Send successfully"},
+          "9995678901"=>{:success => true,:message => "Send successfully"}
+        }
+      end
+    end
   end
 
   describe "#logout" do
+    context "on success" do
+      it "return message 'Logout successfully'" do
+        subject.logout.should == {:success => true,:message => "Logout successfully"}
+      end
+    end
 
+    context "on failure" do
+      before(:each) do
+        stub_request(:get, "http://site6.way2sms.com/jsp/logout.jsp").
+        to_return(:status => 500, :body => "", :headers => {})
+      end
+
+      it "return message 'Logout failed'" do
+        subject.logout.should == {:success => false,:message => "Logout failed"}
+      end
+    end
   end
-
-
-
-  # it "should not send sms without logging in" do
-  #   subject.password = "123456"
-  #   subject.send('9995436867', 'Testing Ruby!!').should == {:success => false,:message => "Login failed"}
-  # end
-
-  # it "should give invalid login if u try to send sms with wrong credentials" do
-  #   subject.password = "123456"
-  #   subject.send_to_many('9995436867;9037864203;9037107542', 'Testing Ruby!!').should == {:success => false,:message => "Login failed"}
-  # end
-
-  # it "successfully logged out" do
-  #   subject.logout.should == {:success => true,:message => "Logout successfully"}
-  # end
-
-#  it "should login successfully" do
-#    subject.login.should == {:success => true,:message => "Login successfully"}
-#  end
-#
-#  it "should send SMS to individual" do
-#    subject.login
-#    subject.send('9995436867', 'should send SMS to individual').should == {:success => true,:message => "Send successfully"}
-#  end
-#
-#  it "send method should accept an array of msisdn" do
-#    subject.send(["9995436867","9037864203","9037107542"],"Testing Ruby.......array").should == {"9995436867" => {:success => true,:message => "Send successfully"},
-#      "9037864203" => {:success => true,:message => "Send successfully"},
-#      "9037107542" => {:success => true,:message => "Send successfully"}}
-#  end
-#
-#  it "send method should accept semicolon seperated msisdns" do
-#    subject.send("9995436867;9037864203;9037107542","send method should accept semicolon seperated msisdns").should == {"9995436867" => {:success => true,:message => "Send successfully"},
-#      "9037864203" => {:success => true,:message => "Send successfully"},
-#      "9037107542" => {:success => true,:message => "Send successfully"}}
-#  end
-#
-#  it "send method should accept an Hash of msisdn" do
-#    msisdn = { 0 => "9995436867", 1 => "9037864203" , 2 => "9037107542"}
-#    subject.send(msisdn,"send method should accept an Hash of msisdn").should == {"9995436867" => {:success => true,:message => "Send successfully"},
-#      "9037864203" => {:success => true,:message => "Send successfully"},
-#      "9037107542" => {:success => true,:message => "Send successfully"}}
-#  end
-#
-#  it "should send SMS to group" do
-#    subject.login
-#    subject.send_to_many('9995436867;9037864203;9037107542', 'send to many method should accept semicolon seperated msisdns').should == {"9995436867" => {:success => true,:message => "Send successfully"},
-#    "9037864203" => {:success => true,:message => "Send successfully"},
-#    "9037107542" => {:success => true,:message => "Send successfully"}}
-#  end
-
 end
