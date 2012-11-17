@@ -1,4 +1,4 @@
-Sendsms Gem [![Build Status](https://secure.travis-ci.org/revathskumar/send-sms-in-ruby.png)](http://travis-ci.org/revathskumar/send-sms-in-ruby?branch=master)
+Sendsms Gem [![Build Status](https://secure.travis-ci.org/revathskumar/send-sms-in-ruby.png)](http://travis-ci.org/revathskumar/send-sms-in-ruby?branch=master) [![Dependency Status](https://gemnasium.com/revathskumar/send-sms-in-ruby.png)](https://gemnasium.com/revathskumar/send-sms-in-ruby)
 ------------------------
 
 
@@ -36,3 +36,7 @@ Sendsms gem helps you to send SMS via way2sms from ruby.
     w2s = SendSms.new "username","password"
     msisdn = "9995436867;9037864203;9037107542"
     w2s.send msisdns, "sending via sendsms gem!!!"
+
+
+## License
+Please see [licence](http://github.com/revathskumar/send-sms-in-ruby/blob/master/LICENSE)
